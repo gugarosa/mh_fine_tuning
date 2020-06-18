@@ -57,4 +57,7 @@ class MLP(Model):
         #
         x = self.fc2(x)
 
+        #
+        x = F.softmax(x, dim=1)
+
         return x
