@@ -23,37 +23,40 @@ class Model(torch.nn.Module):
         # Override its parent class
         super(Model, self).__init__()
 
+        # Creates the initialization weights property
+        self.init_weights = init_weights
+
         # Creates a cpu-based device property
         self.device = device
-
-        # Checks if GPU is avaliable
-        if torch.cuda.is_available() and device == 'cuda':
-            # Uses CUDA in the whole class
-            self.cuda()
 
         # Setting default tensor type to float
         torch.set_default_tensor_type(torch.FloatTensor)
 
-    def _compile(self, init_weights):
+    def _compile(self, lr=0.001):
         """Compiles the network by setting its optimizer, loss function and additional properties.
 
         Args:
-            init_weights (tuple): Tuple holding the minimum and maximum values for weights initialization.
+            lr (float): Learning rate.
 
         """
 
         # Defining an optimizer
-        self.optimizer = optim.Adam(self.parameters())
+        self.optimizer = optim.Adam(self.parameters(), lr=lr)
 
         # Defines the loss as usual
         self.loss = nn.NLLLoss()
 
         # Check if there is a tuple for the weights initialization
-        if init_weights:
+        if self.init_weights:
             # Iterate over all possible parameters
             for _, p in self.named_parameters():
                 # Initializes with a uniform distributed value
                 nn.init.uniform_(p.data, init_weights[0], init_weights[1])
+
+        # Checks if GPU is avaliable
+        if torch.cuda.is_available() and self.device == 'cuda':
+            # Uses CUDA in the whole class
+            self.cuda()
 
     def step(self, batch, train=True):
         """Performs a single batch optimization step.
@@ -108,93 +111,73 @@ class Model(torch.nn.Module):
             # Setting the training flag
             self.train()
 
-            # Initializes both losses as zero
-            train_loss, val_loss = 0.0, 0.0
-
-            # Initializes both accuracies as zero
-            train_acc, val_acc = 0.0, 0.0
+            # Initializes the loss and accuracy as zero
+            mean_loss, mean_acc = 0.0, 0.0
 
             # For every batch in the iterator
             for batch in tqdm(train_iterator):
                 # Resetting the gradients
                 self.optimizer.zero_grad()
 
-                # Calculates the training loss and training accuracy
+                # Calculates the batch's loss
                 loss, acc = self.step(batch)
 
                 # Summing up batch's loss
-                train_loss += loss
+                mean_loss += loss
 
                 # Summing up batch's accuracy
-                train_acc += acc
+                mean_acc += acc
 
-            # Gets the mean training loss across all batches
-            train_loss /= len(train_iterator)
+            # Gets the mean loss across all batches
+            mean_loss /= len(train_iterator)
 
-            # Gets the mean training accuracy across all batches
-            train_acc /= len(train_iterator)
+            # Gets the mean accuracy across all batches
+            mean_acc /= len(train_iterator)
 
-            print(f'Loss: {train_loss} | Accuracy: {train_acc}')
+            print(f'train_loss: {mean_loss} | train_acc: {mean_acc}')
 
             # If there is a validation iterator
             if val_iterator:
-                # Setting the evalution flag
-                self.eval()
+                # Evaluates the network
+                self.evaluate(val_iterator, validation=True)
 
-                # Inhibits the gradient from updating the parameters
-                with torch.no_grad():
-                    # For every batch in the iterator
-                    for batch in tqdm(val_iterator):
-                        # Calculates the validation loss
-                        loss, acc = self.step(batch, train=False)
-
-                        # Summing up batch's loss
-                        val_loss += loss
-
-                        # Summing up batch's accuracy
-                        val_acc += acc
-
-                # Gets the mean validation loss across all batches
-                val_loss /= len(val_iterator)
-
-                # Gets the mean training accuracy across all batches
-                val_acc /= len(val_iterator)
-
-                print(f'Val Loss: {val_loss} | Val Accuracy: {val_acc}')
-
-    def evaluate(self, test_iterator):
+    def evaluate(self, iterator, validation=False):
         """Evaluates the model.
 
         Args:
-            test_iterator (torchtext.data.Iterator): Testing data iterator.
+            iterator (torchtext.data.Iterator): Validation or testing data iterator.
+            validation (bool): Whether it is validation or final evaluation.
 
         """
 
-        print('Evaluating model ...')
+        # Defines a string to hold the step's identifier
+        step_name = 'Validating' if validation else 'Evaluating'
+
+        print(f'{step_name} model ...')
 
         # Setting the evalution flag
         self.eval()
 
         # Initializes the loss and accuracy as zero
-        test_loss, test_acc = 0.0, 0.0
+        mean_loss, mean_acc = 0.0, 0.0
 
         # Inhibits the gradient from updating the parameters
         with torch.no_grad():
             # For every batch in the iterator
-            for i, batch in enumerate(test_iterator):
-                # Calculates the test loss
+            for batch in tqdm(iterator):
+                # Calculates the batch's loss
                 loss, acc = self.step(batch, train=False)
 
                 # Summing up batch's loss
-                test_loss += loss
+                mean_loss += loss
 
                 # Summing up batch's accuracy
-                test_acc += acc
+                mean_acc += acc
 
-        # Gets the mean validation loss across all batches
-        test_loss /= len(test_iterator)
+        # Gets the mean loss across all batches
+        mean_loss /= len(iterator)
 
-        # Gets the mean testing accuracy across all batches
-        test_acc /= len(test_iterator)
+        # Gets the mean accuracy across all batches
+        mean_acc /= len(iterator)
 
-        print(f'Loss: {test_loss} | Accuracy: {test_acc}')
+        print(f'loss: {mean_loss} | acc: {mean_acc}')
