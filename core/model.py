@@ -181,3 +181,5 @@ class Model(torch.nn.Module):
         mean_acc /= len(iterator)
 
         print(f'loss: {mean_loss} | acc: {mean_acc}')
+
+        return mean_loss, mean_acc
