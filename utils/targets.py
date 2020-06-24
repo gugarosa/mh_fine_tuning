@@ -21,13 +21,13 @@ def fine_tune(model, val_iterator):
         """
 
         # Reshaping `w` to appropriate size
-        w = np.reshape(w, (model.fc1.weight.size(0), model.fc1.weight.size(1)))
+        w = np.reshape(w, (model.fc2.weight.size(0), model.fc2.weight.size(1)))
 
         # Converting numpy to tensor
         w = torch.from_numpy(w).float()
 
         # Replacing the layer weights
-        model.fc1.weight = torch.nn.Parameter(w)
+        model.fc2.weight = torch.nn.Parameter(w)
 
         # Evaluating its validation accuracy
         _, acc = model.evaluate(val_iterator)

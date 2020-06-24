@@ -1,5 +1,6 @@
 import argparse
 
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
@@ -73,7 +74,7 @@ if __name__ == '__main__':
     # Gathering optimization variables
     n_agents = args.n_agents
     n_iterations = args.n_iter
-    n_variables = n_input * n_hidden
+    n_variables = n_hidden * n_class
     mh = o.get_mh(args.mh).obj
     hyperparams = o.get_mh(args.mh).hyperparams
 
@@ -92,17 +93,26 @@ if __name__ == '__main__':
     model = model_obj(n_input=n_input, n_hidden=n_hidden, n_classes=n_class, lr=lr, init_weights=None, device=device)
 
     # Pre-fitting the model
-    model.fit(train_iterator, epochs=epochs)
+    model.fit(train_iterator, val_iterator, epochs=epochs)
 
     # Defining lower and upper bounds
-    lb = [model.fc1.weight.min().detach().cpu().numpy()] * n_variables
-    ub = [model.fc1.weight.max().detach().cpu().numpy()] * n_variables
+    lb = list(np.reshape(model.fc2.weight.detach().cpu().numpy() - 0.01, 1280))
+    ub = list(np.reshape(model.fc2.weight.detach().cpu().numpy() + 0.01, 1280))
 
     # Defining the optimization task
     opt_fn = t.fine_tune(model, val_iterator)
 
     # Running the optimization task
     history = opt.optimize(mh, opt_fn, n_agents, n_variables, n_iterations, lb, ub, hyperparams)
+
+    # Reshaping `w` to appropriate size
+    w = np.reshape(history.best_agent[-1][0], (model.fc2.weight.size(0), model.fc2.weight.size(1)))
+
+    # Converting numpy to tensor
+    w = torch.from_numpy(w).float()
+
+    # Replacing the layer weights
+    model.fc2.weight = torch.nn.Parameter(w)
 
     # Evaluating the model
     model.evaluate(test_iterator)
