@@ -43,7 +43,7 @@ class MLP(Model):
             x (torch.Tensor): Tensor containing the data.
 
         Returns:
-            The softmax predictions over the input tensor.
+            The logits predictions over the input tensor.
 
         """
 
@@ -53,8 +53,5 @@ class MLP(Model):
         # Passes down the linear layers
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
-
-        # Applies the softmax function to the outputs
-        x = F.softmax(x, dim=1)
-
+        
         return x

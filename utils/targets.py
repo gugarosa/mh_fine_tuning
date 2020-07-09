@@ -2,10 +2,13 @@ import numpy as np
 import torch
 
 
-def fine_tune(model, val_iterator):
+def fine_tune(model, layer_name, val_iterator):
     """Wraps the reconstruction task for optimization purposes.
 
     Args:
+        model (Model): Child object from Model class.
+        layer_name (str): Identifier of the layer to be optimized.
+        val_iterator (torchtext.data.Iterator): Validation data iterator.
 
     """
 
@@ -20,17 +23,20 @@ def fine_tune(model, val_iterator):
 
         """
 
-        # Reshaping `w` to appropriate size
-        w = np.reshape(w, (model.fc2.weight.size(0), model.fc2.weight.size(1)))
+        # Gathering model's weights
+        W = getattr(model, layer_name).weight
+
+        # Reshaping optimization variables to appropriate size
+        W_cur = np.reshape(w, (W.size(0), W.size(1)))
 
         # Converting numpy to tensor
-        w = torch.from_numpy(w).float()
+        W_cur = torch.from_numpy(W_cur).float()
 
         # Replacing the layer weights
-        model.fc2.weight = torch.nn.Parameter(w)
+        setattr(getattr(model, layer_name), 'weight', torch.nn.Parameter(W_cur))
 
         # Evaluating its validation accuracy
-        _, acc = model.evaluate(val_iterator)
+        _, acc = model.evaluate(val_iterator, validation=True)
 
         return 1 - acc
 

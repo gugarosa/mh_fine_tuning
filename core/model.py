@@ -44,7 +44,7 @@ class Model(torch.nn.Module):
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
 
         # Defines the loss as usual
-        self.loss = nn.NLLLoss()
+        self.loss = nn.CrossEntropyLoss()
 
         # Check if there is a tuple for the weights initialization
         if self.init_weights:

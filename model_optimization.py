@@ -25,6 +25,8 @@ def get_arguments():
 
     parser.add_argument('model_name', help='Model identifier', choices=['mlp'])
 
+    parser.add_argument('layer_name', help='Layer identifier to be optimized')
+
     parser.add_argument('mh', help='Meta-heuristic identifier', choices=['pso'])
 
     parser.add_argument('-n_input', help='Number of input units', type=int, default=784)
@@ -69,13 +71,15 @@ if __name__ == '__main__':
     device = args.device
     batch_size = args.batch_size
     epochs = args.epochs
-    model_obj = o.get_model(args.model_name).obj
+    model_name = args.model_name
+    model_obj = o.get_model(model_name).obj
+    layer_name = args.layer_name
 
     # Gathering optimization variables
     n_agents = args.n_agents
     n_iterations = args.n_iter
-    n_variables = n_hidden * n_class
-    mh = o.get_mh(args.mh).obj
+    mh_name = args.mh
+    mh = o.get_mh(mh_name).obj
     hyperparams = o.get_mh(args.mh).hyperparams
 
     # Loads the data
@@ -95,24 +99,31 @@ if __name__ == '__main__':
     # Pre-fitting the model
     model.fit(train_iterator, val_iterator, epochs=epochs)
 
-    # Defining lower and upper bounds
-    lb = list(np.reshape(model.fc2.weight.detach().cpu().numpy() - 0.01, 1280))
-    ub = list(np.reshape(model.fc2.weight.detach().cpu().numpy() + 0.01, 1280))
+    # Gathering weights from desired layer
+    W = getattr(model, layer_name).weight.detach().cpu().numpy()
+
+    # Defining lower and upper bounds, and number of variables
+    lb = list(np.reshape(W - 0.01, W.shape[0] * W.shape[1]))
+    ub = list(np.reshape(W + 0.01, W.shape[0] * W.shape[1]))
+    n_variables = W.shape[0] * W.shape[1]
 
     # Defining the optimization task
-    opt_fn = t.fine_tune(model, val_iterator)
+    opt_fn = t.fine_tune(model, layer_name, val_iterator)
 
     # Running the optimization task
     history = opt.optimize(mh, opt_fn, n_agents, n_variables, n_iterations, lb, ub, hyperparams)
 
+    # Saving history object
+    history.save(f'outputs/{dataset}_{model_name}_{layer_name}_{mh_name}_{seed}.pkl')
+
     # Reshaping `w` to appropriate size
-    w = np.reshape(history.best_agent[-1][0], (model.fc2.weight.size(0), model.fc2.weight.size(1)))
+    W_best = np.reshape(history.best_agent[-1][0], (W.shape[0], W.shape[1]))
 
     # Converting numpy to tensor
-    w = torch.from_numpy(w).float()
+    W_best = torch.from_numpy(W_best).float()
 
     # Replacing the layer weights
-    model.fc2.weight = torch.nn.Parameter(w)
+    setattr(getattr(model, layer_name), 'weight', torch.nn.Parameter(W_best))
 
     # Evaluating the model
     model.evaluate(test_iterator)
