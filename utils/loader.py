@@ -3,13 +3,12 @@ import torchvision as tv
 
 # A constant used to hold a dictionary of possible datasets
 DATASETS = {
-    'mnist': tv.datasets.MNIST,
-    'fmnist': tv.datasets.FashionMNIST,
-    'kmnist': tv.datasets.KMNIST
+    'cifar10': tv.datasets.CIFAR10,
+    'cifar100': tv.datasets.CIFAR100,
 }
 
 
-def load_dataset(name='mnist', val_split=0.2):
+def load_dataset(name='cifar10', val_split=0.2):
     """Loads an input dataset.
 
     Args:

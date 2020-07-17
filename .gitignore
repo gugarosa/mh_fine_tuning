@@ -1,5 +1,6 @@
-# Data files
+# Data and log files
 data/
+*.log.*
 
 # MacOS temporary files
 **/*.DS_Store

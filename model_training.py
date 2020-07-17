@@ -18,11 +18,11 @@ def get_arguments():
     # Creates the ArgumentParser
     parser = argparse.ArgumentParser(usage='Trains and evaluates a machine learning model.')
 
-    parser.add_argument('dataset', help='Dataset identifier', choices=['mnist', 'fmnist', 'kmnist'])
+    parser.add_argument('dataset', help='Dataset identifier', choices=['cifar10', 'cifar100'])
 
     parser.add_argument('model_name', help='Model identifier', choices=['mlp'])
 
-    parser.add_argument('-n_input', help='Number of input units', type=int, default=784)
+    parser.add_argument('-n_input', help='Number of input units', type=int, default=3072)
 
     parser.add_argument('-n_hidden', help='Number of hidden units', type=int, default=128)
 
@@ -30,7 +30,7 @@ def get_arguments():
 
     parser.add_argument('-lr', help='Learning rate', type=float, default=0.001)
 
-    parser.add_argument('-batch_size', help='Batch size', type=int, default=128)
+    parser.add_argument('-batch_size', help='Batch size', type=int, default=100)
 
     parser.add_argument('-epochs', help='Number of training epochs', type=int, default=10)
 

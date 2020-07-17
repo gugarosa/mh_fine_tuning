@@ -21,7 +21,7 @@ def get_arguments():
     # Creates the ArgumentParser
     parser = argparse.ArgumentParser(usage='Trains and evaluates a machine learning model.')
 
-    parser.add_argument('dataset', help='Dataset identifier', choices=['mnist', 'fmnist', 'kmnist'])
+    parser.add_argument('dataset', help='Dataset identifier', choices=['cifar10', 'cifar100'])
 
     parser.add_argument('model_name', help='Model identifier', choices=['mlp'])
 
@@ -29,7 +29,7 @@ def get_arguments():
 
     parser.add_argument('mh', help='Meta-heuristic identifier', choices=['pso'])
 
-    parser.add_argument('-n_input', help='Number of input units', type=int, default=784)
+    parser.add_argument('-n_input', help='Number of input units', type=int, default=3072)
 
     parser.add_argument('-n_hidden', help='Number of hidden units', type=int, default=128)
 
@@ -37,9 +37,11 @@ def get_arguments():
 
     parser.add_argument('-lr', help='Learning rate', type=float, default=0.001)
 
-    parser.add_argument('-batch_size', help='Batch size', type=int, default=128)
+    parser.add_argument('-batch_size', help='Batch size', type=int, default=100)
 
-    parser.add_argument('-epochs', help='Number of training epochs', type=int, default=1)
+    parser.add_argument('-epochs', help='Number of training epochs', type=int, default=10)
+
+    parser.add_argument('-bounds', help='Searching bounds', type=float, default=0.01)
 
     parser.add_argument('-n_agents', help='Number of meta-heuristic agents', type=int, default=10)
 
@@ -76,6 +78,7 @@ if __name__ == '__main__':
     layer_name = args.layer_name
 
     # Gathering optimization variables
+    bounds = args.bounds
     n_agents = args.n_agents
     n_iterations = args.n_iter
     mh_name = args.mh
@@ -103,8 +106,8 @@ if __name__ == '__main__':
     W = getattr(model, layer_name).weight.detach().cpu().numpy()
 
     # Defining lower and upper bounds, and number of variables
-    lb = list(np.reshape(W - 0.01, W.shape[0] * W.shape[1]))
-    ub = list(np.reshape(W + 0.01, W.shape[0] * W.shape[1]))
+    lb = list(np.reshape(W - bounds, W.shape[0] * W.shape[1]))
+    ub = list(np.reshape(W + bounds, W.shape[0] * W.shape[1]))
     n_variables = W.shape[0] * W.shape[1]
 
     # Defining the optimization task
