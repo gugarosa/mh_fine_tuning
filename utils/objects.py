@@ -4,6 +4,7 @@ from opytimizer.optimizers.swarm import ba, fa, pso
 
 from models.cnn import ResNet
 from models.mlp import MLP
+from models.rnn import LSTM
 
 
 class Model:
@@ -26,6 +27,7 @@ class Model:
 
 # Defines a model dictionary constant with the possible values
 MODEL = dict(
+    lstm=Model(LSTM),
     mlp=Model(MLP),
     resnet=Model(ResNet)
 )
