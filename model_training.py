@@ -20,7 +20,9 @@ def get_arguments():
 
     parser.add_argument('dataset', help='Dataset identifier', choices=['cifar10', 'cifar100'])
 
-    parser.add_argument('model_name', help='Model identifier', choices=['mlp'])
+    parser.add_argument('model_name', help='Model identifier', choices=['mlp', 'resnet'])
+
+    parser.add_argument('model_output', help='Identifier to saved model', type=str)
 
     parser.add_argument('-n_input', help='Number of input units', type=int, default=3072)
 
@@ -50,6 +52,7 @@ if __name__ == '__main__':
     # Gathering variables from arguments
     dataset = args.dataset
     name = args.model_name
+    output = args.model_output
     n_input = args.n_input
     n_hidden = args.n_hidden
     n_class = args.n_class
@@ -82,3 +85,6 @@ if __name__ == '__main__':
 
     # Evaluating the model
     model.evaluate(test_iterator)
+
+    # Saving model
+    torch.save(model, output)
