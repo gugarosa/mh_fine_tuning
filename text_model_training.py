@@ -1,7 +1,7 @@
 import argparse
 
 import torch
-from torch.utils.data import DataLoader
+from torchtext.data import BucketIterator
 
 import utils.loader as l
 import utils.objects as o
@@ -16,19 +16,19 @@ def get_arguments():
     """
 
     # Creates the ArgumentParser
-    parser = argparse.ArgumentParser(usage='Trains and evaluates a machine learning model.')
+    parser = argparse.ArgumentParser(usage='Trains and evaluates a text-based machine learning model.')
 
-    parser.add_argument('dataset', help='Dataset identifier', choices=['cifar10', 'cifar100'])
+    parser.add_argument('dataset', help='Dataset identifier', choices=['sst'])
 
-    parser.add_argument('model_name', help='Model identifier', choices=['mlp', 'resnet'])
+    parser.add_argument('model_name', help='Model identifier', choices=['lstm'])
 
     parser.add_argument('model_output', help='Identifier to saved model', type=str)
 
-    parser.add_argument('-n_input', help='Number of input units', type=int, default=3072)
+    parser.add_argument('-n_embedding', help='Number of embedding units', type=int, default=256)
 
     parser.add_argument('-n_hidden', help='Number of hidden units', type=int, default=128)
 
-    parser.add_argument('-n_class', help='Number of classes', type=int, default=10)
+    parser.add_argument('-n_class', help='Number of classes', type=int, default=5)
 
     parser.add_argument('-lr', help='Learning rate', type=float, default=0.001)
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     dataset = args.dataset
     name = args.model_name
     output = args.model_output
-    n_input = args.n_input
+    n_embedding = args.n_embedding
     n_hidden = args.n_hidden
     n_class = args.n_class
     lr = args.lr
@@ -64,12 +64,15 @@ if __name__ == '__main__':
     seed = args.seed
 
     # Loads the data
-    train, val, test = l.load_dataset(name=dataset)
+    train, val, test, n_input = l.load_text_dataset(name=dataset)
 
     # Creates the iterators
-    train_iterator = DataLoader(train, batch_size=batch_size, shuffle=shuffle)
-    val_iterator = DataLoader(val, batch_size=batch_size, shuffle=shuffle)
-    test_iterator = DataLoader(test, batch_size=batch_size, shuffle=shuffle)
+    train_iterator = BucketIterator(train, batch_size=batch_size, sort_key=lambda x: len(x.text),
+                                    device=device, sort=True, sort_within_batch=True)
+    val_iterator = BucketIterator(val, batch_size=batch_size, sort_key=lambda x: len(x.text),
+                                    device=device, sort=True, sort_within_batch=True)
+    test_iterator = BucketIterator(test, batch_size=batch_size, sort_key=lambda x: len(x.text),
+                                    device=device, sort=True, sort_within_batch=True)
 
     # Defining the torch seed
     torch.manual_seed(seed)
@@ -78,7 +81,8 @@ if __name__ == '__main__':
     model_obj = o.get_model(name).obj
 
     # Initializing the model
-    model = model_obj(n_input=n_input, n_hidden=n_hidden, n_classes=n_class, lr=lr, init_weights=None, device=device)
+    model = model_obj(n_input=n_input, n_embedding=n_embedding, n_hidden=n_hidden,
+                      n_classes=n_class, lr=lr, init_weights=None, device=device)
 
     # Fitting the model
     model.fit(train_iterator, val_iterator, epochs=epochs)

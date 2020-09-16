@@ -20,7 +20,7 @@ def get_arguments():
     """
 
     # Creates the ArgumentParser
-    parser = argparse.ArgumentParser(usage='Optimizes a machine learning model.')
+    parser = argparse.ArgumentParser(usage='Optimizes an image-based machine learning model.')
 
     parser.add_argument('dataset', help='Dataset identifier', choices=['cifar10', 'cifar100'])
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     hyperparams = o.get_mh(args.mh).hyperparams
 
     # Loads the data
-    train, val, test = l.load_dataset(name=dataset)
+    train, val, test = l.load_image_dataset(name=dataset)
 
     # Creates the iterators
     train_iterator = DataLoader(train, batch_size=batch_size, shuffle=shuffle)

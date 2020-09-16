@@ -9,11 +9,12 @@ class LSTM(Model):
 
     """
 
-    def __init__(self, n_input=784, n_hidden=128, n_classes=10, lr=0.001, init_weights=None, device='cpu'):
+    def __init__(self, n_input=784, n_embedding=256, n_hidden=128, n_classes=5, lr=0.001, init_weights=None, device='cpu'):
         """Initialization method.
 
         Args:
             n_input (int): Number of input units.
+            n_embedding (int): Number of embedding units.
             n_hidden (int): Number of hidden units.
             n_classes (int): Number of output units.
             lr (float): Learning rate.
@@ -26,10 +27,10 @@ class LSTM(Model):
         super(LSTM, self).__init__(init_weights, device)
 
         # Embedding layer
-        self.emb = nn.Embedding(n_input, n_hidden)
+        self.emb = nn.Embedding(n_input, n_embedding)
 
         # Recurrent layer
-        self.rnn = nn.LSTM(input_size=n_hidden, hidden_size=n_hidden)
+        self.rnn = nn.LSTM(input_size=n_embedding, hidden_size=n_hidden, batch_first=True)
 
         # Linear layer
         self.fc = nn.Linear(n_hidden, n_classes)
@@ -50,7 +51,7 @@ class LSTM(Model):
 
         # Passes down through the network
         x = self.emb(x)
-        x = self.rnn(x)
-        x = self.fc(x)
+        out, (h, c) = self.rnn(x)
+        preds = self.fc(h[-1])
         
-        return x
+        return preds
