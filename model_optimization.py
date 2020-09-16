@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
+import utils.attribute as a
 import utils.loader as l
 import utils.objects as o
 import utils.optimizer as opt
@@ -81,7 +82,7 @@ if __name__ == '__main__':
     model = torch.load(model_input)
 
     # Gathering weights from desired layer
-    W = getattr(model, layer_name).weight.detach().cpu().numpy()
+    W = a.rgetattr(model, layer_name).weight.detach().cpu().numpy()
 
     # Defining lower and upper bounds, and number of variables
     lb = list(np.reshape(W - bounds, W.shape[0] * W.shape[1]))
@@ -104,7 +105,7 @@ if __name__ == '__main__':
     W_best = torch.from_numpy(W_best).float()
 
     # Replacing the layer weights
-    setattr(getattr(model, layer_name), 'weight', torch.nn.Parameter(W_best))
+    a.rsetattr(a.rgetattr(model, layer_name), 'weight', torch.nn.Parameter(W_best))
 
     # Evaluating the model
     model.evaluate(test_iterator)

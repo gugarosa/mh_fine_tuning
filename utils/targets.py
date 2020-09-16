@@ -1,6 +1,8 @@
 import numpy as np
 import torch
 
+import utils.attribute as a
+
 
 def fine_tune(model, layer_name, val_iterator):
     """Wraps the reconstruction task for optimization purposes.
@@ -24,7 +26,7 @@ def fine_tune(model, layer_name, val_iterator):
         """
 
         # Gathering model's weights
-        W = getattr(model, layer_name).weight
+        W = a.rgetattr(model, layer_name).weight
 
         # Reshaping optimization variables to appropriate size
         W_cur = np.reshape(w, (W.size(0), W.size(1)))
@@ -33,7 +35,7 @@ def fine_tune(model, layer_name, val_iterator):
         W_cur = torch.from_numpy(W_cur).float()
 
         # Replacing the layer weights
-        setattr(getattr(model, layer_name), 'weight', torch.nn.Parameter(W_cur))
+        a.rsetattr(a.rgetattr(model, layer_name), 'weight', torch.nn.Parameter(W_cur))
 
         # Evaluating its validation accuracy
         _, acc = model.evaluate(val_iterator, validation=True)

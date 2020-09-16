@@ -1,3 +1,8 @@
+# Output files
+*.pth
+*.history
+*.optimized
+
 # Data and log files
 data/
 *.log.*
