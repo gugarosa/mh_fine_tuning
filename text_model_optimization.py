@@ -68,15 +68,15 @@ if __name__ == '__main__':
     hyperparams = o.get_mh(args.mh).hyperparams
 
     # Loads the data
-    train, val, test = l.load_text_dataset(name=dataset)
+    train, val, test, _ = l.load_text_dataset(name=dataset)
 
     # Creates the iterators
     train_iterator = BucketIterator(train, batch_size=batch_size, sort_key=lambda x: len(x.text),
-                                    device=device, sort=True, sort_within_batch=True)
+                                    sort=True, sort_within_batch=True)
     val_iterator = BucketIterator(val, batch_size=batch_size, sort_key=lambda x: len(x.text),
-                                    device=device, sort=True, sort_within_batch=True)
+                                  sort=True, sort_within_batch=True)
     test_iterator = BucketIterator(test, batch_size=batch_size, sort_key=lambda x: len(x.text),
-                                    device=device, sort=True, sort_within_batch=True)
+                                   sort=True, sort_within_batch=True)
 
     # Defining the torch seed
     torch.manual_seed(seed)

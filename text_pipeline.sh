@@ -1,5 +1,5 @@
 # Defining the dataset to be used
-DATA="imdb"
+DATA="sst"
 
 # Architecture
 MODEL="lstm"
@@ -11,7 +11,7 @@ N_EMBEDDING=256
 N_HIDDEN=512
 
 # Number of classes
-N_CLASS=2
+N_CLASS=3
 
 # Learning rate
 LR=0.001
@@ -20,10 +20,10 @@ LR=0.001
 BATCH_SIZE=100
 
 # Training epochs
-EPOCHS=10
+EPOCHS=5
 
 # Layer to be optimized
-OPT_LAYER="fc2"
+OPT_LAYER="fc"
 
 # Meta-heuristic
 MH="pso"
@@ -32,10 +32,10 @@ MH="pso"
 BOUNDS=0.01
 
 # Number of agents
-N_AGENTS=1
+N_AGENTS=5
 
 # Number of iterations
-N_ITER=1
+N_ITER=10
 
 # Device
 DEVICE="cpu"
@@ -44,7 +44,7 @@ DEVICE="cpu"
 SEED=0
 
 # Trains an architecture
-python text_model_training.py ${DATA} ${MODEL} ${MODEL}_${SEED}.pth -n_embedding ${N_INPUT} -n_hidden ${N_HIDDEN} -n_class ${N_CLASS} -lr ${LR} -batch_size ${BATCH_SIZE} -epochs ${EPOCHS} -device ${DEVICE} -seed ${SEED}
+python text_model_training.py ${DATA} ${MODEL} ${MODEL}_${SEED}.pth -n_embedding ${N_EMBEDDING} -n_hidden ${N_HIDDEN} -n_class ${N_CLASS} -lr ${LR} -batch_size ${BATCH_SIZE} -epochs ${EPOCHS} -device ${DEVICE} -seed ${SEED}
 
 # Optimizes the architecture
 python text_model_optimization.py ${DATA} ${MODEL}_${SEED}.pth ${OPT_LAYER} ${MH} -batch_size ${BATCH_SIZE} -bounds ${BOUNDS} -n_agents ${N_AGENTS} -n_iter ${N_ITER} -seed ${SEED}
