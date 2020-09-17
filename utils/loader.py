@@ -1,3 +1,5 @@
+import random
+
 import torch
 import torchtext as tt
 import torchvision as tv
@@ -15,12 +17,13 @@ TEXT_DATASETS = {
 }
 
 
-def load_image_dataset(name='cifar10', val_split=0.2):
+def load_image_dataset(name='cifar10', val_split=0.2, seed=0):
     """Loads an input image dataset.
 
     Args:
         name (str): Name of dataset to be loaded.
         val_split (float): Percentage of split for the validation set.
+        seed (int): Random seed.
 
     Returns:
         Training, validation and testing sets of loaded dataset.
@@ -28,7 +31,7 @@ def load_image_dataset(name='cifar10', val_split=0.2):
     """
 
     # Defining the torch seed
-    torch.manual_seed(0)
+    torch.manual_seed(seed)
 
     # Loads the training data
     train = IMAGE_DATASETS[name](root='./data', train=True, download=True,
@@ -45,12 +48,13 @@ def load_image_dataset(name='cifar10', val_split=0.2):
     return train, val, test
 
 
-def load_text_dataset(name='imdb', val_split=0.2):
+def load_text_dataset(name='imdb', val_split=0.2, seed=0):
     """Loads an input text dataset.
 
     Args:
         name (str): Name of dataset to be loaded.
         val_split (float): Percentage of split for the validation set.
+        seed (int): Random seed.
 
     Returns:
         Training, validation and testing sets of loaded dataset.
@@ -58,7 +62,7 @@ def load_text_dataset(name='imdb', val_split=0.2):
     """
 
     # Defining the torch seed
-    torch.manual_seed(0)
+    torch.manual_seed(seed)
 
     # Defining fields
     TEXT = tt.data.Field(lower=True, batch_first=True)
@@ -70,7 +74,7 @@ def load_text_dataset(name='imdb', val_split=0.2):
         _train, test = TEXT_DATASETS[name].splits(TEXT, LABEL, root='./data')
 
         # Splits a new validation set
-        train, val = _train.split(split_ratio=(1-val_split))
+        train, val = _train.split(split_ratio=(1-val_split), random_state=random.seed(seed))
 
     # If is SST dataset
     elif name == 'sst':

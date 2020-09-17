@@ -68,7 +68,7 @@ if __name__ == '__main__':
     hyperparams = o.get_mh(args.mh).hyperparams
 
     # Loads the data
-    train, val, test = l.load_image_dataset(name=dataset)
+    train, val, test = l.load_image_dataset(name=dataset, seed=seed)
 
     # Creates the iterators
     train_iterator = DataLoader(train, batch_size=batch_size, shuffle=shuffle)
