@@ -18,7 +18,7 @@ def get_arguments():
     # Creates the ArgumentParser
     parser = argparse.ArgumentParser(usage='Trains and evaluates a text-based machine learning model.')
 
-    parser.add_argument('dataset', help='Dataset identifier', choices=['sst'])
+    parser.add_argument('dataset', help='Dataset identifier', choices=['imdb', 'sst'])
 
     parser.add_argument('model_name', help='Model identifier', choices=['lstm'])
 
@@ -28,7 +28,7 @@ def get_arguments():
 
     parser.add_argument('-n_hidden', help='Number of hidden units', type=int, default=128)
 
-    parser.add_argument('-n_class', help='Number of classes', type=int, default=5)
+    parser.add_argument('-n_class', help='Number of classes', type=int, default=2)
 
     parser.add_argument('-lr', help='Learning rate', type=float, default=0.001)
 

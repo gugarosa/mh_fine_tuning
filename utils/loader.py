@@ -10,6 +10,7 @@ INAGE_DATASETS = {
 
 # A constant used to hold a dictionary of possible text datasets
 TEXT_DATASETS = {
+    'imdb': tt.datasets.IMDB,
     'sst': tt.datasets.SST
 }
 
@@ -44,11 +45,12 @@ def load_image_dataset(name='cifar10', val_split=0.2):
     return train, val, test
 
 
-def load_text_dataset(name='sst'):
+def load_text_dataset(name='imdb', val_split=0.2):
     """Loads an input text dataset.
 
     Args:
         name (str): Name of dataset to be loaded.
+        val_split (float): Percentage of split for the validation set.
 
     Returns:
         Training, validation and testing sets of loaded dataset.
@@ -60,10 +62,20 @@ def load_text_dataset(name='sst'):
 
     # Defining fields
     TEXT = tt.data.Field(lower=True, batch_first=True)
-    LABEL = tt.data.Field(sequential=True, batch_first=True)
+    LABEL = tt.data.LabelField(sequential=True, batch_first=True)
 
-    # Loads the data
-    train, val, test = TEXT_DATASETS[name].splits(TEXT, LABEL, root='./data')
+    # Checks if it IMDB dataset
+    if name == 'imdb':
+        # Loads the data
+        _train, test = TEXT_DATASETS[name].splits(TEXT, LABEL, root='./data')
+
+        # Splits a new validation set
+        train, val = _train.split(split_ratio=(1-val_split))
+
+    # If is SST dataset
+    elif name == 'sst':
+        # Loads the data
+        train, val, test = TEXT_DATASETS[name].splits(TEXT, LABEL, root='./data')
 
     # Builds the vocabulary
     TEXT.build_vocab(train)

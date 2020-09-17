@@ -9,7 +9,7 @@ class LSTM(Model):
 
     """
 
-    def __init__(self, n_input=784, n_embedding=256, n_hidden=128, n_classes=5, lr=0.001, init_weights=None, device='cpu'):
+    def __init__(self, n_input=784, n_embedding=256, n_hidden=128, n_classes=2, lr=0.001, init_weights=None, device='cpu'):
         """Initialization method.
 
         Args:

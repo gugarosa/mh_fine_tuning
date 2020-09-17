@@ -71,8 +71,8 @@ class Model(torch.nn.Module):
         """
 
         # Gathers the batch's input and target
-        x, y = batch[0], batch[1]
-        # x, y = batch.text, batch.label.squeeze(-1)
+        # x, y = batch[0], batch[1]
+        x, y = batch.text, batch.label
 
         # Calculate the predictions based on inputs
         preds = self(x)
