@@ -44,7 +44,7 @@ DEVICE="cpu"
 SEED=0
 
 # Trains an architecture
-python image_model_training.py ${DATA} ${MODEL} ${MODEL}_${SEED}.pth -n_input ${N_INPUT} -n_hidden ${N_HIDDEN} -n_class ${N_CLASS} -lr ${LR} -batch_size ${BATCH_SIZE} -epochs ${EPOCHS} -device ${DEVICE} -seed ${SEED}
+python image_model_training.py ${DATA} ${MODEL} ${MODEL}_${DATA}_${SEED}.pth -n_input ${N_INPUT} -n_hidden ${N_HIDDEN} -n_class ${N_CLASS} -lr ${LR} -batch_size ${BATCH_SIZE} -epochs ${EPOCHS} -device ${DEVICE} -seed ${SEED}
 
 # Optimizes the architecture
-python image_model_optimization.py ${DATA} ${MODEL}_${SEED}.pth ${OPT_LAYER} ${MH} -batch_size ${BATCH_SIZE} -bounds ${BOUNDS} -n_agents ${N_AGENTS} -n_iter ${N_ITER} -seed ${SEED}
+python image_model_optimization.py ${DATA} ${MODEL}_${DATA}_${SEED}.pth ${OPT_LAYER} ${MH} -batch_size ${BATCH_SIZE} -bounds ${BOUNDS} -n_agents ${N_AGENTS} -n_iter ${N_ITER} -seed ${SEED}
