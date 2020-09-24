@@ -5,7 +5,7 @@ import torchtext as tt
 import torchvision as tv
 
 # A constant used to hold a dictionary of possible image datasets
-INAGE_DATASETS = {
+IMAGE_DATASETS = {
     'cifar10': tv.datasets.CIFAR10,
     'cifar100': tv.datasets.CIFAR100,
 }
@@ -27,7 +27,7 @@ def load_image_dataset(name='cifar10', val_split=0.2, seed=0):
 
     Returns:
         Training, validation and testing sets of loaded dataset.
-        
+
     """
 
     # Defining the torch seed
@@ -35,7 +35,10 @@ def load_image_dataset(name='cifar10', val_split=0.2, seed=0):
 
     # Loads the training data
     train = IMAGE_DATASETS[name](root='./data', train=True, download=True,
-                           transform=tv.transforms.ToTensor())
+                                 transform=tv.transforms.Compose([
+                                     tv.transforms.ToTensor(),
+                                     tv.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+                                ]))
 
     # Splitting the training data into training/validation
     train, val = torch.utils.data.random_split(
@@ -43,7 +46,10 @@ def load_image_dataset(name='cifar10', val_split=0.2, seed=0):
 
     # Loads the testing data
     test = IMAGE_DATASETS[name](root='./data', train=False, download=True,
-                          transform=tv.transforms.ToTensor())
+                                transform=tv.transforms.Compose([
+                                    tv.transforms.ToTensor(),
+                                    tv.transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
+                                )]))
 
     return train, val, test
 
@@ -58,7 +64,7 @@ def load_text_dataset(name='imdb', val_split=0.2, seed=0):
 
     Returns:
         Training, validation and testing sets of loaded dataset.
-        
+
     """
 
     # Defining the torch seed
@@ -74,12 +80,14 @@ def load_text_dataset(name='imdb', val_split=0.2, seed=0):
         _train, test = TEXT_DATASETS[name].splits(TEXT, LABEL, root='./data')
 
         # Splits a new validation set
-        train, val = _train.split(split_ratio=(1-val_split), random_state=random.seed(seed))
+        train, val = _train.split(split_ratio=(
+            1-val_split), random_state=random.seed(seed))
 
     # If is SST dataset
     elif name == 'sst':
         # Loads the data
-        train, val, test = TEXT_DATASETS[name].splits(TEXT, LABEL, root='./data')
+        train, val, test = TEXT_DATASETS[name].splits(
+            TEXT, LABEL, root='./data')
 
     # Builds the vocabulary
     TEXT.build_vocab(train)

@@ -28,6 +28,9 @@ class ResNet(Model):
         # Loads base model from torchvision
         self.model = tv.models.resnet18()
 
+        # Replaces first convolutional layer with smaller kernel, stride and padding
+        self.model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
+
         # Replaces fully-connected layer with proper number of classes
         self.model.fc = nn.Linear(512, n_classes)
 
