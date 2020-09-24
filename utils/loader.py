@@ -5,7 +5,7 @@ import torchtext as tt
 import torchvision as tv
 
 # A constant used to hold a dictionary of possible image datasets
-INAGE_DATASETS = {
+IMAGE_DATASETS = {
     'cifar10': tv.datasets.CIFAR10,
     'cifar100': tv.datasets.CIFAR100,
 }
