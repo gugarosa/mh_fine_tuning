@@ -40,11 +40,14 @@ N_ITER=10
 # Device
 DEVICE="cpu"
 
-# Defining the seed
-SEED=0
+# Defining the number of runnings
+N_RUNS=10
 
-# Trains an architecture
-python text_model_training.py ${DATA} ${MODEL} ${MODEL}_${DATA}_${SEED}.pth -n_embedding ${N_EMBEDDING} -n_hidden ${N_HIDDEN} -n_class ${N_CLASS} -lr ${LR} -batch_size ${BATCH_SIZE} -epochs ${EPOCHS} -device ${DEVICE} -seed ${SEED}
+# Iterates through all possible seeds
+for SEED in $(seq 1 $N_RUNS); do
+    # Trains an architecture
+    python text_model_training.py ${DATA} ${MODEL} ${MODEL}_${DATA}_${SEED}.pth -n_embedding ${N_EMBEDDING} -n_hidden ${N_HIDDEN} -n_class ${N_CLASS} -lr ${LR} -batch_size ${BATCH_SIZE} -epochs ${EPOCHS} -device ${DEVICE} -seed ${SEED}
 
-# Optimizes the architecture
-python text_model_optimization.py ${DATA} ${MODEL}_${DATA}_${SEED}.pth ${OPT_LAYER} ${MH} -batch_size ${BATCH_SIZE} -bounds ${BOUNDS} -n_agents ${N_AGENTS} -n_iter ${N_ITER} -seed ${SEED}
+    # Optimizes the architecture
+    python text_model_optimization.py ${DATA} ${MODEL}_${DATA}_${SEED}.pth ${OPT_LAYER} ${MH} -batch_size ${BATCH_SIZE} -bounds ${BOUNDS} -n_agents ${N_AGENTS} -n_iter ${N_ITER} -seed ${SEED}
+done
