@@ -74,6 +74,11 @@ class Model(torch.nn.Module):
         x, y = batch[0], batch[1]
         # x, y = batch.text, batch.label
 
+        # Checks if current device is CUDA
+        if self.device == 'cuda':
+            # If yes, passes data and labels to GPU
+            x, y = x.cuda(), y.cuda()
+
         # Calculate the predictions based on inputs
         preds = self(x)
 
