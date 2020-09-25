@@ -96,7 +96,7 @@ if __name__ == '__main__':
     history = opt.optimize(mh, opt_fn, n_agents, n_variables, n_iterations, lb, ub, hyperparams)
 
     # Saving history object
-    history.save(f'{model_input}.history')
+    history.save(f'{model_input}_{mh_name}.history')
 
     # Reshaping `w` to appropriate size
     W_best = np.reshape(history.best_agent[-1][0], (W.shape[0], W.shape[1]))
@@ -111,4 +111,4 @@ if __name__ == '__main__':
     model.evaluate(test_iterator)
 
     # Saving optimized model
-    torch.save(model, f'{model_input}.optimized')
+    torch.save(model, f'{model_input}_{mh_name}.optimized')
