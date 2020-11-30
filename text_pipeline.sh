@@ -20,7 +20,7 @@ LR=0.001
 BATCH_SIZE=100
 
 # Training epochs
-EPOCHS=5
+EPOCHS=1
 
 # Layer to be optimized
 OPT_LAYER="fc"
@@ -32,16 +32,16 @@ MH="pso"
 BOUNDS=0.01
 
 # Number of agents
-N_AGENTS=5
+N_AGENTS=1
 
 # Number of iterations
-N_ITER=10
+N_ITER=1
 
 # Device
 DEVICE="cpu"
 
 # Defining the number of runnings
-N_RUNS=10
+N_RUNS=1
 
 # Iterates through all possible seeds
 for SEED in $(seq 1 $N_RUNS); do
@@ -50,4 +50,7 @@ for SEED in $(seq 1 $N_RUNS); do
 
     # Optimizes the architecture
     python text_model_optimization.py ${DATA} ${MODEL}_${DATA}_${SEED}.pth ${OPT_LAYER} ${MH} -batch_size ${BATCH_SIZE} -bounds ${BOUNDS} -n_agents ${N_AGENTS} -n_iter ${N_ITER} -seed ${SEED}
+
+    # Evaluates the architecture
+    python text_model_evaluation.py ${DATA} ${MODEL}_${DATA}_${SEED}.pth_${MH}.optimized -batch_size ${BATCH_SIZE} -seed ${SEED}
 done
