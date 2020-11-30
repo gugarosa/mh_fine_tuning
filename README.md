@@ -82,6 +82,20 @@ python text_model_optimization.py -h
 
 *Note that `-h` invokes the script helper, which assists users in employing the appropriate parameters.*
 
+### Model Evaluation
+
+Finally, with an optimized models in hands, it is now possible to evaluate the model over the testing set. Please, use the following script to accomplish such a procedure:
+
+```Python
+python image_model_evaluation.py -h
+```
+
+or
+
+```Python
+python text_model_evaluation.py -h
+```
+
 ### Bash Script
 
 Instead of invoking every script to conduct the experiments, it is also possible to use the provided shell script, as follows:
