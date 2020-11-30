@@ -36,11 +36,11 @@ def get_arguments():
 
     parser.add_argument('-epochs', help='Number of training epochs', type=int, default=10)
 
-    parser.add_argument('-shuffle', help='Whether data should be shuffled or not', type=bool, default=True)
-
     parser.add_argument('-device', help='CPU or GPU usage', choices=['cpu', 'cuda'])
 
     parser.add_argument('-seed', help='Seed identifier', type=int, default=0)
+
+    parser.add_argument('--shuffle', help='Whether data should be shuffled or not', action='store_true')
 
     return parser.parse_args()
 
@@ -59,17 +59,15 @@ if __name__ == '__main__':
     lr = args.lr
     device = args.device
     batch_size = args.batch_size
-    shuffle = args.shuffle
     epochs = args.epochs
     seed = args.seed
+    shuffle = args.shuffle
 
     # Loads the data
-    train, val, test = l.load_image_dataset(name=dataset, seed=seed)
+    train, _, _ = l.load_image_dataset(name=dataset, seed=seed)
 
     # Creates the iterators
     train_iterator = DataLoader(train, batch_size=batch_size, shuffle=shuffle)
-    val_iterator = DataLoader(val, batch_size=batch_size, shuffle=shuffle)
-    test_iterator = DataLoader(test, batch_size=batch_size, shuffle=shuffle)
 
     # Defining the torch seed
     torch.manual_seed(seed)
@@ -81,10 +79,7 @@ if __name__ == '__main__':
     model = model_obj(n_input=n_input, n_hidden=n_hidden, n_classes=n_class, lr=lr, init_weights=None, device=device)
 
     # Fitting the model
-    model.fit(train_iterator, val_iterator, epochs=epochs)
-
-    # Evaluating the model
-    model.evaluate(test_iterator)
+    model.fit(train_iterator, epochs=epochs)
 
     # Saving model
     torch.save(model, output)

@@ -24,7 +24,7 @@ def get_arguments():
 
     parser.add_argument('dataset', help='Dataset identifier', choices=['cifar10', 'cifar100'])
 
-    parser.add_argument('model_input', help='Path to saved model that will be inputted', type=str)
+    parser.add_argument('model_input', help='Path to saved model that will be optimized', type=str)
 
     parser.add_argument('layer_name', help='Layer identifier to be optimized')
 
@@ -38,9 +38,9 @@ def get_arguments():
 
     parser.add_argument('-n_iter', help='Number of meta-heuristic iterations', type=int, default=15)
 
-    parser.add_argument('-shuffle', help='Whether data should be shuffled or not', type=bool, default=True)
-
     parser.add_argument('-seed', help='Seed identifier', type=int, default=0)
+
+    parser.add_argument('--shuffle', help='Whether data should be shuffled or not', action='store_true')
 
     return parser.parse_args()
 
@@ -51,8 +51,8 @@ if __name__ == '__main__':
 
     # Gathering common variables
     dataset = args.dataset
-    shuffle = args.shuffle
     seed = args.seed
+    shuffle = args.shuffle
 
     # Gathering model's variables
     model_input = args.model_input
@@ -68,12 +68,10 @@ if __name__ == '__main__':
     hyperparams = o.get_mh(args.mh).hyperparams
 
     # Loads the data
-    train, val, test = l.load_image_dataset(name=dataset, seed=seed)
+    _, val, _ = l.load_image_dataset(name=dataset, seed=seed)
 
     # Creates the iterators
-    train_iterator = DataLoader(train, batch_size=batch_size, shuffle=shuffle)
     val_iterator = DataLoader(val, batch_size=batch_size, shuffle=shuffle)
-    test_iterator = DataLoader(test, batch_size=batch_size, shuffle=shuffle)
 
     # Defining the torch seed
     torch.manual_seed(seed)
@@ -106,9 +104,6 @@ if __name__ == '__main__':
 
     # Replacing the layer weights
     a.rsetattr(a.rgetattr(model, layer_name), 'weight', torch.nn.Parameter(W_best))
-
-    # Evaluating the model
-    model.evaluate(test_iterator)
 
     # Saving optimized model
     torch.save(model, f'{model_input}_{mh_name}.optimized')
