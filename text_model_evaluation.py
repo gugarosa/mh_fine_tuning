@@ -1,6 +1,7 @@
 import argparse
 
 import torch
+from sklearn.metrics import classification_report
 from torchtext.data import BucketIterator
 
 import utils.loader as l
@@ -56,5 +57,10 @@ if __name__ == '__main__':
     # Loads pre-trained model
     model = torch.load(model_input)
 
-    # Evaluating the model
-    model.evaluate(test_iterator)
+    # Predicts test data with the model
+    y_preds, y_true = model.predict(test_iterator)
+
+    # Performs the classification report
+    report = classification_report(y_true, y_preds, output_dict=True)
+
+    print(report)

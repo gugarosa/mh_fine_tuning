@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch import nn, optim
 from tqdm import tqdm
@@ -189,3 +190,40 @@ class Model(torch.nn.Module):
         print(f'loss: {mean_loss} | acc: {mean_acc}')
 
         return mean_loss, mean_acc
+
+    def predict(self, iterator):
+        """Predicts input data over an iterator.
+
+        Args:
+            iterator (torchtext.data.Iterator): Validation or testing data iterator.
+
+        """
+
+        print('Predicting model ...')
+
+        # Creates empty lists for preds and true labels
+        y_preds, y_true = [], []
+
+        # Setting the evalution flag
+        self.eval()
+
+        # Inhibits the gradient from updating the parameters
+        with torch.no_grad():
+            # For every batch in the iterator
+            for batch in tqdm(iterator):
+                # Gathers the batch's input and target
+                x, y = batch[0], batch[1]
+                # x, y = batch.text, batch.label
+
+                # Checks if current device is CUDA
+                if self.device == 'cuda':
+                    # If yes, passes data and labels to GPU
+                    x, y = x.cuda(), y.cuda()
+
+                # Calculate the predictions based on inputs
+                y_preds.append(torch.argmax(self(x), -1).numpy())
+
+                # Appends the true labels to their list
+                y_true.append(y.numpy())
+
+        return np.concatenate([x.ravel() for x in y_preds]), np.concatenate([x.ravel() for x in y_true])
