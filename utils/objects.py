@@ -1,4 +1,3 @@
-from opytimizer.core.optimizer import Optimizer
 from opytimizer.optimizers.evolutionary import de, ga
 from opytimizer.optimizers.swarm import ba, fa, pso
 
