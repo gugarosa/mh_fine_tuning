@@ -8,7 +8,17 @@
 
 If you use our work to fulfill any of your needs, please cite us:
 
-```
+```BibTex
+@inproceedings{deRosa:21,
+  author={De Rosa, Gustavo H. and Roder, Mateus and Papa, João Paulo and Dos Santos, Claudio F.G.},
+  booktitle={2021 IEEE Symposium Series on Computational Intelligence (SSCI)}, 
+  title={Improving Pre- Trained Weights through Meta - Heuristics Fine- Tuning}, 
+  year={2021},
+  volume={},
+  number={},
+  pages={1-8},
+  doi={10.1109/SSCI50451.2021.9659945}
+}
 ```
 
 ---
